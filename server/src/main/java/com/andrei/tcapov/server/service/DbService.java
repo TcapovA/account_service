@@ -33,7 +33,7 @@ public class DbService {
     private static void createTable() {
         try {
             dataSource.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS ACCOUNTS");
-            dataSource.getConnection().createStatement().executeUpdate("CREATE TABLE ACCOUNTS(ID INT PRIMARY KEY, AMOUNT INT NOT NULL)");
+            dataSource.getConnection().createStatement().executeUpdate("CREATE TABLE ACCOUNTS(ID INT PRIMARY KEY, AMOUNT BIGINT NOT NULL)");
         } catch (SQLException ex) {
             throw new RuntimeException("Error while trying to create table", ex);
         }
@@ -79,6 +79,7 @@ public class DbService {
             return "Account with id = " + id + " has been successfully updated";
         } catch (JdbcSQLException jdbcEx) {
             // account has already been created
+
             return updateAmount(id, amount);
         } catch (SQLException ex) {
             if (connection != null) {
