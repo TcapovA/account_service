@@ -1,5 +1,8 @@
-package com.andrei.tcapov.client;
+package com.andrei.tcapov.client.handler;
 
+
+import com.andrei.tcapov.client.service.ConfigService;
+import com.andrei.tcapov.client.service.IdRange;
 
 import java.util.concurrent.ThreadLocalRandom;
 

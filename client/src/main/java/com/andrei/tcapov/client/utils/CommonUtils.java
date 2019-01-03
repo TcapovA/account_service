@@ -1,6 +1,6 @@
 package com.andrei.tcapov.client.utils;
 
-import com.andrei.tcapov.client.IdRange;
+import com.andrei.tcapov.client.service.IdRange;
 
 public class CommonUtils {
 

@@ -1,4 +1,6 @@
-package com.andrei.tcapov.client;
+package com.andrei.tcapov.client.handler;
+
+import com.andrei.tcapov.client.service.IdRange;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,7 +10,7 @@ public class GetStatisticsClient extends AbstractClient {
 
     private ScheduledExecutorService scheduledExecutorService;
 
-    GetStatisticsClient() {
+    public GetStatisticsClient() {
         super();
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     }

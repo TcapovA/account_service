@@ -5,20 +5,27 @@ import com.andrei.tcapov.server.api.Account;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Cache {
 
     private ConcurrentMap<Integer, Account> cache;
-    private CleanCacheTask cleanTask;
-    private Thread thread;
-    private final long maxLivingTimeMillis;
+    private final long maxLivingTimeSec;
+
+    private final ScheduledExecutorService cleanCacheExecutor;
 
     public Cache() {
-        maxLivingTimeMillis = ConfigService.getCacheLivingTime();
+        maxLivingTimeSec = ConfigService.getCacheLivingTime();
         cache = new ConcurrentHashMap<>();
-        cleanTask = new CleanCacheTask(this);
-        thread = new Thread(cleanTask);
-        thread.start();
+
+        cleanCacheExecutor = Executors.newSingleThreadScheduledExecutor();
+        cleanCacheStart();
+    }
+
+    private void cleanCacheStart() {
+        cleanCacheExecutor.scheduleWithFixedDelay(this::cleanCache, maxLivingTimeSec, maxLivingTimeSec, TimeUnit.SECONDS);
     }
 
     public void put(Account account) {
@@ -33,17 +40,17 @@ public class Cache {
         return account;
     }
 
-    public void cleanCache() {
+    private void cleanCache() {
         long currentDateTime = Instant.now().toEpochMilli();
 
         cache.values().removeIf(account -> {
             long difference = currentDateTime - account.getLastAccessDate();
 
-            return difference > 0 && difference < maxLivingTimeMillis;
+            return difference > 0 && difference < maxLivingTimeSec;
         });
     }
 
     public void shutdown() {
-        thread.interrupt();
+        cleanCacheExecutor.shutdown();
     }
 }

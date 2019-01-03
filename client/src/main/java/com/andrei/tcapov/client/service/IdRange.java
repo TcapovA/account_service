@@ -1,4 +1,4 @@
-package com.andrei.tcapov.client;
+package com.andrei.tcapov.client.service;
 
 public class IdRange {
 

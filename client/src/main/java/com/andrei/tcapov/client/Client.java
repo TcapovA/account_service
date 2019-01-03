@@ -1,5 +1,10 @@
 package com.andrei.tcapov.client;
 
+import com.andrei.tcapov.client.handler.AddAmountClient;
+import com.andrei.tcapov.client.service.ConfigService;
+import com.andrei.tcapov.client.handler.GetAmountClient;
+import com.andrei.tcapov.client.handler.GetStatisticsClient;
+
 public class Client {
 
     // for future usage

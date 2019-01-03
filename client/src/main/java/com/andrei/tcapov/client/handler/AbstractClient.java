@@ -1,4 +1,7 @@
-package com.andrei.tcapov.client;
+package com.andrei.tcapov.client.handler;
+
+import com.andrei.tcapov.client.service.ConfigService;
+import com.andrei.tcapov.client.service.IdRange;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -7,7 +10,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public abstract class AbstractClient {
