@@ -1,6 +1,6 @@
 package com.andrei.tcapov.client.service;
 
-import com.andrei.tcapov.client.utils.CommonUtils;
+import com.andrei.tcapov.client.util.CommonUtils;
 
 import java.util.HashMap;
 import java.util.Map;

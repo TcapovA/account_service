@@ -16,18 +16,12 @@
     </modules>
 
     <properties>
-        <commons-dbcp.version>1.4</commons-dbcp.version>
         <hikariCP.version>2.7.8</hikariCP.version>
         <h2.version>1.4.197</h2.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${commons-dbcp.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>

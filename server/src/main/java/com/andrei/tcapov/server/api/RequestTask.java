@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 
@@ -29,7 +28,7 @@ public class RequestTask implements Runnable {
         try (DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
              BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
             String line = in.readLine();
-            Logger.sendMessage(line);
+            Logger.log(line);
 
             String[] requestData = line.split(DELIMITER);
             RequestType requestType = getRequestType(requestData);
@@ -45,8 +44,8 @@ public class RequestTask implements Runnable {
                 case STOP:
                     command = new StopCommand(requestData);
                     break;
-                case STATISTIC:
-                    command = new StatisticsCommand(getStatisticService, addStatisticService);
+                case GET_STATISTICS:
+                    command = new GetStatisticsCommand(getStatisticService, addStatisticService);
                     break;
                 case RESET_STATISTICS:
                     command = new ResetStatisticsCommand(getStatisticService, addStatisticService);
@@ -57,26 +56,26 @@ public class RequestTask implements Runnable {
                 default:
                     // shouldn't be here
                     String message = "Internal error while handling request: " + line;
-                    Logger.sendMessage(message);
+                    Logger.log(message);
                     throw new IllegalArgumentException(message);
             }
             String res = command.execute();
 
             String msg = "result of " + command + ": " + res;
-            Logger.sendMessage(msg);
+            Logger.log(msg);
             outputStream.writeBytes(res + "\r\n");
             outputStream.flush();
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
-            Logger.sendMessage(ex.getMessage());
+            Logger.log(ex.getMessage());
         } catch (Exception ex) {
             // Add logging stack trace
-            Logger.sendMessage("Error while trying to handle request" + Arrays.toString(ex.getStackTrace()));
+            Logger.log("Error while trying to handle request" + Arrays.toString(ex.getStackTrace()));
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException ioEx) {
-                Logger.sendMessage(Arrays.toString(ioEx.getStackTrace()));
+                Logger.log(Arrays.toString(ioEx.getStackTrace()));
             }
         }
     }
@@ -91,15 +90,20 @@ public class RequestTask implements Runnable {
         if (type.equals(RequestType.GET.val)) {
             getStatisticService.incrementRequestCounter();
             return RequestType.GET;
-        } else if (type.equals(RequestType.ADD.val)) {
+        }
+        if (type.equals(RequestType.ADD.val)) {
             addStatisticService.incrementRequestCounter();
             return RequestType.ADD;
-        } else if (type.equals(RequestType.STATISTIC.val)) {
-            return RequestType.STATISTIC;
-        } else if (type.equals(RequestType.RESET_STATISTICS.val)) {
-            return RequestType.RESET_STATISTICS;
-        } else {
-            return RequestType.UNKNOWN;
         }
+        if (type.equals(RequestType.GET_STATISTICS.val)) {
+            return RequestType.GET_STATISTICS;
+        }
+        if (type.equals(RequestType.RESET_STATISTICS.val)) {
+            return RequestType.RESET_STATISTICS;
+        }
+        if (type.equals(RequestType.STOP.val)) {
+            return RequestType.STOP;
+        }
+        return RequestType.UNKNOWN;
     }
 }

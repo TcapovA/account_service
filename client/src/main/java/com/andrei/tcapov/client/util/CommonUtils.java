@@ -1,4 +1,4 @@
-package com.andrei.tcapov.client.utils;
+package com.andrei.tcapov.client.util;
 
 import com.andrei.tcapov.client.service.IdRange;
 

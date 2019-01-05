@@ -25,7 +25,7 @@ public class Cache {
     }
 
     private void cleanCacheStart() {
-        cleanCacheExecutor.scheduleWithFixedDelay(this::cleanCache, maxLivingTimeSec, maxLivingTimeSec, TimeUnit.SECONDS);
+        cleanCacheExecutor.scheduleAtFixedRate(this::cleanCache, maxLivingTimeSec, maxLivingTimeSec, TimeUnit.SECONDS);
     }
 
     public void put(Account account) {

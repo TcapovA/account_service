@@ -14,14 +14,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public abstract class AbstractClient {
 
-    protected static final String DELIMITER = ";";
+    static final String DELIMITER = ";";
 
     private ThreadPoolExecutor executor;
 
-    protected AbstractClient() {
+    AbstractClient() {
     }
 
-    public AbstractClient(int n) {
+    AbstractClient(int n) {
         this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(n);
     }
 
@@ -30,7 +30,7 @@ public abstract class AbstractClient {
         executor.execute( () -> getTask(idRange) );
     }
 
-    protected void getTask(IdRange idRange) {
+    void getTask(IdRange idRange) {
         try (Socket clientSocket = new Socket(ConfigService.getServerHost(), ConfigService.getServerPort());
              DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
              BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {

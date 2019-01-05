@@ -22,7 +22,7 @@ public class GetCommand extends Command {
 
         if (account == null) {
             String message = "Account with id = " + getRequest.getId() + " not found in cache";
-            Logger.sendMessage(message);
+            Logger.log(message);
             try {
                 long amount = DbService.getAmount(getRequest.getId());
                 return String.valueOf(amount);
@@ -42,7 +42,7 @@ public class GetCommand extends Command {
             return new GetAmountRequest(Integer.parseInt(commandData[1]));
         } catch (NumberFormatException e) {
             String message = "Bad message with params: " + commandData;
-            Logger.sendMessage(message);
+            Logger.log(message);
             throw new IllegalArgumentException(message);
         }
     }

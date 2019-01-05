@@ -3,7 +3,7 @@ package com.andrei.tcapov.server.api;
 public enum RequestType {
     GET("GET"),
     ADD("ADD"),
-    STATISTIC("STATISTIC"),
+    GET_STATISTICS("GET_STATISTICS"),
     RESET_STATISTICS("RESET_STATISTICS"),
     STOP("STOP"),
     UNKNOWN("UNKNOWN");

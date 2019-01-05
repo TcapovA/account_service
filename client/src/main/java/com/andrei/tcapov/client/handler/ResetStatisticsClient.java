@@ -6,11 +6,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class GetStatisticsClient extends AbstractClient {
+public class ResetStatisticsClient extends AbstractClient {
 
     private ScheduledExecutorService scheduledExecutorService;
 
-    public GetStatisticsClient() {
+    public ResetStatisticsClient() {
         super();
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     }
@@ -22,11 +22,11 @@ public class GetStatisticsClient extends AbstractClient {
 
     @Override
     protected String getMethodName() {
-        return "GET_STATISTICS";
+        return "RESET_STATISTICS";
     }
 
     @Override
     public void execute() {
-        scheduledExecutorService.scheduleAtFixedRate(() -> getTask(null), 2L, 2L, TimeUnit.SECONDS);
+        scheduledExecutorService.schedule(() -> getTask(null), 10, TimeUnit.SECONDS);
     }
 }

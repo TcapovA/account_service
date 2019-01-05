@@ -39,7 +39,7 @@ public class Server {
 
         String serverStartedMsg = "Server has been successfully initialized";
         System.out.println(serverStartedMsg);
-        Logger.sendMessage(serverStartedMsg);
+        Logger.log(serverStartedMsg);
     }
 
     private static void handleRequests() {
@@ -57,13 +57,15 @@ public class Server {
     private static void stopServer() {
         System.out.println("Trying to shut down the server");
         System.out.println("Trying to shut down an executor");
+        executor.shutdown();
         try {
-            executor.awaitTermination(ConfigService.getExecutorAwaitTermination(), TimeUnit.SECONDS);
-            executor.shutdown();
+            if (!executor.awaitTermination(ConfigService.getExecutorAwaitTermination(), TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
             System.out.println("Executor has been successfully shut down");
         } catch (InterruptedException e) {
-            System.out.println("Error while trying to terminate executor service");
-            e.printStackTrace();
+            Logger.log(e);
+            executor.shutdownNow();
         }
 
         System.out.println("Trying to close the socket");
@@ -71,7 +73,7 @@ public class Server {
             serverSocket.close();
             System.out.println("Socket has been closed");
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Logger.log(ex);
         }
         DbService.shutdown();
 
@@ -79,7 +81,7 @@ public class Server {
         cache.shutdown();
 
         System.out.println("Trying to shut down the Logger");
-        Logger.sendMessage("Trying to shut down the Logger");
+        Logger.log("Trying to shut down the Logger");
         Logger.shutdown();
         System.out.println("Logger has been successfully shut down");
 

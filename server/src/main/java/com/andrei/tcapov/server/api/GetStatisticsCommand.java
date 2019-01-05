@@ -1,14 +1,15 @@
 package com.andrei.tcapov.server.api;
 
 import com.andrei.tcapov.server.service.StatisticService;
+import com.andrei.tcapov.server.util.CommonUtils;
 
-public class StatisticsCommand extends Command {
+public class GetStatisticsCommand extends Command {
 
     private StatisticService getStatistics;
     private StatisticService addStatistics;
 
-    public StatisticsCommand(StatisticService getStatistics, StatisticService addStatistics) {
-        super(null);
+    GetStatisticsCommand(StatisticService getStatistics, StatisticService addStatistics) {
+        super(CommonUtils.getOneElementStringArray(RequestType.GET_STATISTICS.val));
         this.getStatistics = getStatistics;
         this.addStatistics = addStatistics;
     }

@@ -1,16 +1,17 @@
 package com.andrei.tcapov.client.handler;
 
+import com.andrei.tcapov.client.Client;
 import com.andrei.tcapov.client.service.IdRange;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class GetStatisticsClient extends AbstractClient {
+public class StopClient extends AbstractClient {
 
     private ScheduledExecutorService scheduledExecutorService;
 
-    public GetStatisticsClient() {
+    public StopClient() {
         super();
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     }
@@ -22,11 +23,15 @@ public class GetStatisticsClient extends AbstractClient {
 
     @Override
     protected String getMethodName() {
-        return "GET_STATISTICS";
+        return "STOP";
     }
 
     @Override
     public void execute() {
-        scheduledExecutorService.scheduleAtFixedRate(() -> getTask(null), 2L, 2L, TimeUnit.SECONDS);
+        Runnable stopRunnable = () -> {
+            getTask(null);
+            Client.stopApp();
+        };
+        scheduledExecutorService.schedule(stopRunnable, 21L, TimeUnit.SECONDS);
     }
 }

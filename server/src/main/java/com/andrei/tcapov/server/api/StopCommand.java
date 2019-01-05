@@ -11,6 +11,6 @@ public class StopCommand extends Command {
     @Override
     public String execute() {
         Server.setStopFlag();
-        return "Server stopped";
+        return "Set stop flag to true";
     }
 }

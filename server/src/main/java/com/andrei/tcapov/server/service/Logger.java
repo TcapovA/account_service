@@ -23,12 +23,12 @@ public class Logger {
     private static ConcurrentLinkedQueue<String> logQueue = new ConcurrentLinkedQueue<>();
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();;
 
-    public static void sendMessage(String message) {
+    public static void log(String message) {
         logQueue.offer(LocalDateTime.now() + ": " + message);
     }
 
-    public static void sendMessage(Exception ex) {
-        sendMessage(Arrays.toString(ex.getStackTrace()));
+    public static void log(Exception ex) {
+        log(Arrays.toString(ex.getStackTrace()));
     }
 
     private static void writeLogs() {
@@ -41,7 +41,7 @@ public class Logger {
             }
         } catch (IOException ex) {
             // skip
-            Logger.sendMessage(ex);
+            Logger.log(ex);
         }
     }
 
@@ -54,7 +54,7 @@ public class Logger {
                 File logFile = new File(dir, ConfigService.getLogFileName());
                 logFile.createNewFile();
             } catch (IOException e) {
-                Logger.sendMessage(e);
+                Logger.log(e);
                 // skip
             }
         }
@@ -62,7 +62,7 @@ public class Logger {
             try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.TRUNCATE_EXISTING)) {
 
             } catch (IOException ex) {
-                Logger.sendMessage(ex);
+                Logger.log(ex);
             }
         }
         logQueue.offer("App launched at " + LocalDateTime.now());
@@ -73,7 +73,7 @@ public class Logger {
         try {
             executor.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            executor.shutdown();
+            executor.shutdownNow();
         }
     }
 }

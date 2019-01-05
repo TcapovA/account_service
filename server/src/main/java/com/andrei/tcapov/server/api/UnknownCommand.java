@@ -2,6 +2,8 @@ package com.andrei.tcapov.server.api;
 
 import com.andrei.tcapov.server.service.Logger;
 
+import java.util.Arrays;
+
 public class UnknownCommand extends Command {
 
     UnknownCommand(String[] command) {
@@ -10,8 +12,8 @@ public class UnknownCommand extends Command {
 
     @Override
     public String execute() {
-        String message = "Unknown command from request: " + commandData;
-        Logger.sendMessage(message);
+        String message = "Unknown command from request: " + Arrays.toString(commandData);
+        Logger.log(message);
         throw new IllegalArgumentException(message);
     }
 }

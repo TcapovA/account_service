@@ -86,8 +86,8 @@ public class DbService {
                 connection.rollback();
             }
             String errMsg = "Error while trying to handle request! with params: " + id + " " + amount;
-            Logger.sendMessage(errMsg);
-            Logger.sendMessage(ex);
+            Logger.log(errMsg);
+            Logger.log(ex);
             return errMsg;
         } finally {
             if (createStatement != null) {
@@ -147,7 +147,6 @@ public class DbService {
         try {
             Class.forName(ConfigService.getDbDriver());
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
             throw new IllegalArgumentException("Can't establish jdbc connection using driver: " +
                     ConfigService.getDbDriver());
         }
