@@ -7,6 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Клиент, отправляющий серверу запрос на прекращение работы. Формат: {STOP}
+ */
 public class StopClient extends AbstractClient {
 
     private ScheduledExecutorService scheduledExecutorService;

@@ -20,11 +20,10 @@ public class Cache {
         maxLivingTimeSec = ConfigService.getCacheLivingTime();
         cache = new ConcurrentHashMap<>();
 
-        cleanCacheExecutor = Executors.newSingleThreadScheduledExecutor();
-        cleanCacheStart();
+        cleanCacheExecutor = Executors.newSingleThreadScheduledExecutor(new DeamonThreadFactory());
     }
 
-    private void cleanCacheStart() {
+    public void cleanCacheStart() {
         cleanCacheExecutor.scheduleAtFixedRate(this::cleanCache, maxLivingTimeSec, maxLivingTimeSec, TimeUnit.SECONDS);
     }
 
@@ -41,10 +40,10 @@ public class Cache {
     }
 
     private void cleanCache() {
-        long currentDateTime = Instant.now().toEpochMilli();
+        long currentDateTime = System.currentTimeMillis();
 
         cache.values().removeIf(account -> {
-            long difference = currentDateTime - account.getLastAccessDate();
+            long difference = TimeUnit.MILLISECONDS.toSeconds(currentDateTime - account.getLastAccessDate());
 
             return difference > 0 && difference < maxLivingTimeSec;
         });

@@ -6,6 +6,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Клиент, отправляющий серверу запросы на сброс статистики. Формат: {RESET_STATISTICS}
+ */
 public class ResetStatisticsClient extends AbstractClient {
 
     private ScheduledExecutorService scheduledExecutorService;

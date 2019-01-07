@@ -6,6 +6,10 @@ import com.andrei.tcapov.client.service.IdRange;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Клиент, отправляющий серверу запросы на изменение баланса счета с заданным id. Формат: {ADD;id;amount}
+ */
+
 public class AddAmountClient extends AbstractClient {
 
     private static final String METHOD = "ADD";

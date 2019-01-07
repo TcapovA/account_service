@@ -6,6 +6,10 @@ import com.andrei.tcapov.client.service.IdRange;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Клиент, отправляющий серверу запросы на получение баланса счета с заданным id. Формат: {GET;id}
+ */
+
 public class GetAmountClient extends AbstractClient {
 
     private static final String METHOD = "GET";

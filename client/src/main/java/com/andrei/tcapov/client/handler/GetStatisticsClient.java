@@ -6,6 +6,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Клиент, отправляющий серверу запросы на получение статистики. Формат: {GET_STATISTICS}
+ */
 public class GetStatisticsClient extends AbstractClient {
 
     private ScheduledExecutorService scheduledExecutorService;
@@ -27,6 +30,6 @@ public class GetStatisticsClient extends AbstractClient {
 
     @Override
     public void execute() {
-        scheduledExecutorService.scheduleAtFixedRate(() -> getTask(null), 2L, 2L, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleAtFixedRate(() -> getTask(null), 4L, 2L, TimeUnit.SECONDS);
     }
 }

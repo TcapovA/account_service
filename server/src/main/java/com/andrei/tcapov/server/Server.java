@@ -37,6 +37,8 @@ public class Server {
         DbService.init();
         serverSocket = new ServerSocket(ConfigService.getServerPort());
 
+        cache.cleanCacheStart();
+
         String serverStartedMsg = "Server has been successfully initialized";
         System.out.println(serverStartedMsg);
         Logger.log(serverStartedMsg);
@@ -49,7 +51,7 @@ public class Server {
                 RequestTask task = new RequestTask(clientSocket);
                 executor.execute(task);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                Logger.log(ex);
             }
         } while (!flagStopped);
     }
@@ -64,7 +66,6 @@ public class Server {
             }
             System.out.println("Executor has been successfully shut down");
         } catch (InterruptedException e) {
-            Logger.log(e);
             executor.shutdownNow();
         }
 
@@ -86,6 +87,7 @@ public class Server {
         System.out.println("Logger has been successfully shut down");
 
         System.out.println("Server has been successfully shut down");
+        System.exit(1);
     }
 
     public static void setStopFlag() {

@@ -1,6 +1,5 @@
 package com.andrei.tcapov.server.api;
 
-import java.time.Instant;
 import java.util.Objects;
 
 public class Account {
@@ -8,7 +7,7 @@ public class Account {
     public Account(Integer id, Long amount) {
         this.id = id;
         this.amount = amount;
-        lastAccessDate = Instant.now().toEpochMilli();
+        lastAccessDate = System.currentTimeMillis();
     }
 
     /**
