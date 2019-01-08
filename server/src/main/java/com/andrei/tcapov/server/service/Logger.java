@@ -71,9 +71,11 @@ public class Logger {
 
     public static void shutdown() {
         try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
+            executor.shutdown();
+            if (executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
         }
     }
 }

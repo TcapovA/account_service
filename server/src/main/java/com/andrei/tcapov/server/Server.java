@@ -1,6 +1,7 @@
 package com.andrei.tcapov.server;
 
 import com.andrei.tcapov.server.api.RequestTask;
+import com.andrei.tcapov.server.exception.InsufficientFundsException;
 import com.andrei.tcapov.server.service.Cache;
 import com.andrei.tcapov.server.service.DbService;
 import com.andrei.tcapov.server.service.Logger;

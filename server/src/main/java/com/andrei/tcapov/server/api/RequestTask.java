@@ -1,5 +1,6 @@
 package com.andrei.tcapov.server.api;
 
+import com.andrei.tcapov.server.exception.InsufficientFundsException;
 import com.andrei.tcapov.server.service.Logger;
 import com.andrei.tcapov.server.service.StatisticService;
 
@@ -8,11 +9,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class RequestTask implements Runnable {
 
     private static final String DELIMITER = ";";
+    private static final String END_OF_MESSAGE = "\r\n";
 
     private static final StatisticService getStatisticService = new StatisticService();
     private static final StatisticService addStatisticService = new StatisticService();
@@ -25,8 +26,9 @@ public class RequestTask implements Runnable {
 
     @Override
     public void run() {
-        try (DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
-             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+        DataOutputStream outputStream = null;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+            outputStream = new DataOutputStream(clientSocket.getOutputStream());
             String line = in.readLine();
             Logger.log(line);
 
@@ -63,19 +65,32 @@ public class RequestTask implements Runnable {
 
             String msg = "result of " + command + ": " + res;
             Logger.log(msg);
-            outputStream.writeBytes(res + "\r\n");
+            outputStream.writeBytes(res + END_OF_MESSAGE);
             outputStream.flush();
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+        } catch (IllegalArgumentException | InsufficientFundsException ex) {
             Logger.log(ex.getMessage());
+            try {
+                if (outputStream != null) {
+                    outputStream.writeBytes(ex.getMessage() + END_OF_MESSAGE);
+                }
+            } catch (IOException e) {
+                Logger.log(e);
+            }
         } catch (Exception ex) {
-            // Add logging stack trace
-            Logger.log("Error while trying to handle request" + Arrays.toString(ex.getStackTrace()));
+            Logger.log("Error while trying to handle request" + ex);
         } finally {
+            try{
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                Logger.log(e);
+            }
             try {
                 clientSocket.close();
             } catch (IOException ioEx) {
-                Logger.log(Arrays.toString(ioEx.getStackTrace()));
+                Logger.log(ioEx);
             }
         }
     }

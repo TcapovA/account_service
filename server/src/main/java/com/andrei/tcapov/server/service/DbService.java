@@ -2,6 +2,7 @@ package com.andrei.tcapov.server.service;
 
 import com.andrei.tcapov.server.Server;
 import com.andrei.tcapov.server.api.Account;
+import com.andrei.tcapov.server.exception.InsufficientFundsException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbc.JdbcSQLException;
@@ -19,6 +20,7 @@ public class DbService {
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource dataSource;
 
+    private static String checkAccountWithIdExistsSql;
     private static String getAccountByIdSql;
     private static String addAmountSql;
     private static String createAmountWithIdSql;
@@ -27,17 +29,28 @@ public class DbService {
         initJdbcConnection();
         initDataSource();
         initSqlStatements();
-        createTable();
     }
 
-    private static void createTable() {
+    public static boolean isRowExist(int id) throws SQLException {
+        Connection connection = null;
+        Statement statement = null;
         try {
-            dataSource.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS ACCOUNTS");
-            dataSource.getConnection().createStatement().executeUpdate("CREATE TABLE ACCOUNTS(ID INT PRIMARY KEY, AMOUNT BIGINT NOT NULL)");
-        } catch (SQLException ex) {
-            throw new RuntimeException("Error while trying to create table", ex);
+            connection = dataSource.getConnection();
+            connection.setReadOnly(true);
+            statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(checkAccountExist(id));
+            return resultSet.next();
+        } finally {
+            if (connection != null) {
+                connection.setReadOnly(false);
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
         }
-        System.out.println("test");
     }
 
     public static long getAmount(int id) throws SQLException {
@@ -114,7 +127,11 @@ public class DbService {
                 amount = resultSet.getLong("AMOUNT");
             }
             createStatement = connection.createStatement();
-            createStatement.executeUpdate(updateAmountSql(id, prevAmount + amount));
+            long newAmount = prevAmount + amount;
+            if (newAmount < 0) {
+                throw new InsufficientFundsException("Insufficient funds at account with id = " + id);
+            }
+            createStatement.executeUpdate(updateAmountSql(id, newAmount));
             connection.commit();
             Server.getCache().put(new Account(id, amount));
             return "Account with id = " + id + " has been successfully updated";
@@ -166,6 +183,7 @@ public class DbService {
     }
 
     private static void initSqlStatements() {
+
         getAccountByIdSql =
                 "SELECT * FROM ACCOUNTS " +
                         "WHERE ID = %s";
@@ -176,6 +194,14 @@ public class DbService {
         createAmountWithIdSql =
                 "INSERT INTO ACCOUNTS(ID, AMOUNT) " +
                         "VALUES (%s, %s)";
+
+        checkAccountWithIdExistsSql =
+                "SELECT 1 FROM ACCOUNTS " +
+                        "WHERE ID = %s";
+    }
+
+    private static String checkAccountExist(int id) {
+        return String.format(checkAccountWithIdExistsSql, id);
     }
 
     private static String getAccountSql(int id) {

@@ -3,10 +3,8 @@ package com.andrei.tcapov.server.api;
 import com.andrei.tcapov.server.Server;
 import com.andrei.tcapov.server.service.Cache;
 import com.andrei.tcapov.server.service.DbService;
-import com.andrei.tcapov.server.service.Logger;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 
 public class AddCommand extends Command {
 
@@ -20,13 +18,13 @@ public class AddCommand extends Command {
         Cache cache = Server.getCache();
         Account account = cache.get(addRequest.getId());
         try {
-            if (account == null) {
-                return DbService.createAccount(addRequest.getId(), addRequest.getAmount());
-            } else {
+            if (account != null || DbService.isRowExist(addRequest.getId())) {
                 return DbService.updateAmount(addRequest.getId(), addRequest.getAmount() + account.getAmount());
+            } else {
+                return DbService.createAccount(addRequest.getId(), addRequest.getAmount());
             }
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Exception while trying to update account with id = addRequest.getId()", e);
+            throw new IllegalArgumentException("Exception while trying to update account with id = " + addRequest.getId(), e);
         }
     }
 
