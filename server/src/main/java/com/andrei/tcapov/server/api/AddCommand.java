@@ -1,7 +1,7 @@
 package com.andrei.tcapov.server.api;
 
 import com.andrei.tcapov.server.Server;
-import com.andrei.tcapov.server.service.Cache;
+import com.andrei.tcapov.server.service.CacheService;
 import com.andrei.tcapov.server.service.DbService;
 
 import java.sql.SQLException;
@@ -15,8 +15,8 @@ public class AddCommand extends Command {
     @Override
     public String execute() {
         AddAmountRequest addRequest = convertToAddRequest(commandData);
-        Cache cache = Server.getCache();
-        Account account = cache.get(addRequest.getId());
+        CacheService cacheService = Server.getCacheService();
+        Account account = cacheService.get(addRequest.getId());
         try {
             if (account != null || DbService.isRowExist(addRequest.getId())) {
                 return DbService.updateAmount(addRequest.getId(), addRequest.getAmount() + account.getAmount());

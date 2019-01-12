@@ -1,8 +1,7 @@
 package com.andrei.tcapov.server;
 
 import com.andrei.tcapov.server.api.RequestTask;
-import com.andrei.tcapov.server.exception.InsufficientFundsException;
-import com.andrei.tcapov.server.service.Cache;
+import com.andrei.tcapov.server.service.CacheService;
 import com.andrei.tcapov.server.service.DbService;
 import com.andrei.tcapov.server.service.Logger;
 import com.andrei.tcapov.server.service.ConfigService;
@@ -16,12 +15,12 @@ import java.util.concurrent.TimeUnit;
 
 public class Server {
     private static ThreadPoolExecutor executor;
-    private static Cache cache;
+    private static CacheService cacheService;
     private static ServerSocket serverSocket;
     private static volatile boolean flagStopped = false;
 
-    public static Cache getCache() {
-        return cache;
+    public static CacheService getCacheService() {
+        return cacheService;
     }
 
     public static void main(String[] args) throws IOException {
@@ -33,12 +32,12 @@ public class Server {
     private static void init() throws IOException {
         ConfigService.init();
         executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        cache = new Cache();
+        cacheService = new CacheService();
         Logger.init();
         DbService.init();
         serverSocket = new ServerSocket(ConfigService.getServerPort());
 
-        cache.cleanCacheStart();
+        cacheService.cleanCacheStart();
 
         String serverStartedMsg = "Server has been successfully initialized";
         System.out.println(serverStartedMsg);
@@ -79,8 +78,8 @@ public class Server {
         }
         DbService.shutdown();
 
-        System.out.println("Shutting down cache");
-        cache.shutdown();
+        System.out.println("Shutting down cacheService");
+        cacheService.shutdown();
 
         System.out.println("Trying to shut down the Logger");
         Logger.log("Trying to shut down the Logger");

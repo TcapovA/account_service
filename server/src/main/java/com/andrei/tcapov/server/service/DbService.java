@@ -11,8 +11,17 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DbService {
+
+    // Current cache-DB synchronization implementation used only for test purposes (learning
+    // different java.util.concurrent mechanisms)
+    private static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private static final Lock readLock = readWriteLock.readLock();
+    private static final Lock writeLock = readWriteLock.writeLock();
 
     private DbService() {
     }
@@ -54,6 +63,15 @@ public class DbService {
     }
 
     public static long getAmount(int id) throws SQLException {
+        try {
+            readLock.lock();
+            Account account = Server.getCacheService().get(id);
+            if (account != null) {
+                return account.getAmount();
+            }
+        } finally {
+            readLock.unlock();
+        }
         Connection connection = null;
         Statement statement = null;
         try {
@@ -87,8 +105,13 @@ public class DbService {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.createStatement().executeUpdate(createAccountSql(id, amount));
             // Not atomic in absence of synchronization
-            connection.commit();
-            Server.getCache().put(new Account(id, amount));
+            try {
+                writeLock.lock();
+                connection.commit();
+                Server.getCacheService().put(new Account(id, amount));
+            } finally {
+                writeLock.unlock();
+            }
             return "Account with id = " + id + " has been successfully updated";
         } catch (JdbcSQLException jdbcEx) {
             // account has already been created
@@ -132,8 +155,13 @@ public class DbService {
                 throw new InsufficientFundsException("Insufficient funds at account with id = " + id);
             }
             createStatement.executeUpdate(updateAmountSql(id, newAmount));
-            connection.commit();
-            Server.getCache().put(new Account(id, amount));
+            try {
+                writeLock.lock();
+                connection.commit();
+                Server.getCacheService().put(new Account(id, amount));
+            } finally {
+                writeLock.unlock();
+            }
             return "Account with id = " + id + " has been successfully updated";
         } catch (SQLException ex) {
             if (connection != null) {

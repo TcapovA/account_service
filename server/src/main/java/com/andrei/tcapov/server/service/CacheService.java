@@ -2,25 +2,24 @@ package com.andrei.tcapov.server.service;
 
 import com.andrei.tcapov.server.api.Account;
 
-import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Cache {
+public class CacheService {
 
-    private ConcurrentMap<Integer, Account> cache;
+    private final ConcurrentMap<Integer, Account> cacheHolder;
     private final long maxLivingTimeSec;
 
     private final ScheduledExecutorService cleanCacheExecutor;
 
-    public Cache() {
+    public CacheService() {
         maxLivingTimeSec = ConfigService.getCacheLivingTime();
-        cache = new ConcurrentHashMap<>();
+        cacheHolder = new ConcurrentHashMap<>();
 
-        cleanCacheExecutor = Executors.newSingleThreadScheduledExecutor(new DeamonThreadFactory());
+        cleanCacheExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadDeamonFactory());
     }
 
     public void cleanCacheStart() {
@@ -28,11 +27,11 @@ public class Cache {
     }
 
     public void put(Account account) {
-        cache.put(account.getId(), account);
+        cacheHolder.put(account.getId(), account);
     }
 
     public Account get(Integer id) {
-        Account account = cache.get(id);
+        Account account = cacheHolder.get(id);
         if (account == null) {
             return null;
         }
@@ -42,7 +41,7 @@ public class Cache {
     private void cleanCache() {
         long currentDateTime = System.currentTimeMillis();
 
-        cache.values().removeIf(account -> {
+        cacheHolder.values().removeIf(account -> {
             long difference = TimeUnit.MILLISECONDS.toSeconds(currentDateTime - account.getLastAccessDate());
 
             return difference > 0 && difference < maxLivingTimeSec;

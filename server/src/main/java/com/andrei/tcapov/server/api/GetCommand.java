@@ -1,7 +1,7 @@
 package com.andrei.tcapov.server.api;
 
 import com.andrei.tcapov.server.Server;
-import com.andrei.tcapov.server.service.Cache;
+import com.andrei.tcapov.server.service.CacheService;
 import com.andrei.tcapov.server.service.DbService;
 import com.andrei.tcapov.server.service.Logger;
 
@@ -17,11 +17,11 @@ public class GetCommand extends Command {
     @Override
     public String execute() {
         GetAmountRequest getRequest = convertToGetRequest(commandData);
-        Cache cache = Server.getCache();
-        Account account = cache.get(getRequest.getId());
+        CacheService cacheService = Server.getCacheService();
+        Account account = cacheService.get(getRequest.getId());
 
         if (account == null) {
-            String message = "Account with id = " + getRequest.getId() + " not found in cache";
+            String message = "Account with id = " + getRequest.getId() + " not found in cacheService";
             Logger.log(message);
             try {
                 long amount = DbService.getAmount(getRequest.getId());
@@ -31,7 +31,7 @@ public class GetCommand extends Command {
             }
         } else {
             account.setLastAccessDate(Instant.now().toEpochMilli());
-            cache.put(account);
+            cacheService.put(account);
         }
 
         return String.valueOf(account.getAmount());

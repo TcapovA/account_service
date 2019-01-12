@@ -3,9 +3,9 @@ package com.andrei.tcapov.server.service;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-public class DeamonThreadFactory implements ThreadFactory {
+public class ThreadDeamonFactory implements ThreadFactory {
 
-    public DeamonThreadFactory() {
+    public ThreadDeamonFactory() {
     }
 
     @Override
